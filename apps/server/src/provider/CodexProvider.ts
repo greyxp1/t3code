@@ -780,8 +780,12 @@ export const checkCodexProviderStatus = Effect.fn("checkCodexProviderStatus")(fu
   const accountStatus = managedAuth
     ? { status: "ready" as const, auth: managedAuth, message: undefined }
     : accountProbeStatus(snapshot);
+  // API keys and providers that authenticate without OpenAI, such as a proxy, have no ChatGPT
+  // plan to read. Rate limits a proxy forwards during turns belong to whichever upstream
+  // account served the turn, so they are not this instance's limits either.
   const usageLimits =
-    snapshot.account.account?.type === "apiKey"
+    snapshot.account.account?.type === "apiKey" ||
+    (!snapshot.account.account && !snapshot.account.requiresOpenaiAuth)
       ? makeUnavailableUsageLimits({ checkedAt, reason: "unsupported" })
       : snapshot.rateLimits === undefined || "failure" in snapshot.rateLimits
         ? makeUnavailableUsageLimits({

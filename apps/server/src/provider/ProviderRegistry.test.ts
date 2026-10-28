@@ -420,6 +420,7 @@ it.layer(
 
         assert.strictEqual(status.status, "ready");
         assert.strictEqual(status.auth.status, "unknown");
+        assert.deepStrictEqual(status.usageLimits?.unavailable, { reason: "unsupported" });
       }),
     );
   });
