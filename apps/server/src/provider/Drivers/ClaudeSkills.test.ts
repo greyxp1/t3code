@@ -492,6 +492,13 @@ it.layer(NodeServices.layer)("discoverClaudeSkills", (it) => {
           description: "Managed deploy.",
         },
       ]);
+      assert.deepEqual(
+        yield* discoverClaudeSkills({ homePath: configDir }, workspace, {
+          PROGRAMFILES: ` ${programFiles} `,
+          PROGRAMDATA: programData,
+        }),
+        managedSkills,
+      );
     }),
   );
 
