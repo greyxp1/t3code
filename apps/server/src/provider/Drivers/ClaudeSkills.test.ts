@@ -460,7 +460,10 @@ it.layer(NodeServices.layer)("discoverClaudeSkills", (it) => {
           PROGRAMDATA: programData,
           ...(ProgramFiles !== undefined ? { ProgramFiles } : {}),
         });
-        assert.deepEqual(legacySkills, [{ ...skills[0], enabled: false }]);
+        assert.deepEqual(
+          legacySkills,
+          skills.map((skill) => ({ ...skill, enabled: false })),
+        );
       }
       yield* writeSkill(
         path.join(programFiles, "ClaudeCode", ".claude", "skills"),
