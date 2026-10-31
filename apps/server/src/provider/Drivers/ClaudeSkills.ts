@@ -128,6 +128,7 @@ function skillOverrideSettingsPaths(
   repositoryRoot?: string,
 ): ReadonlyArray<string> {
   const managedDirectory = claudeManagedDirectory(path, platform, environment);
+  const programData = platform === "win32" ? environment.PROGRAMDATA?.trim() : undefined;
   const root = repositoryRoot !== undefined && repositoryRoot !== cwd ? repositoryRoot : undefined;
   return [
     path.join(configDirPath, "settings.json"),
@@ -138,6 +139,7 @@ function skillOverrideSettingsPaths(
         ]
       : []),
     ...(root ? [path.join(root, ".claude", "settings.local.json")] : []),
+    ...(programData ? [path.join(programData, "ClaudeCode", "managed-settings.json")] : []),
     ...(managedDirectory ? [path.join(managedDirectory, "managed-settings.json")] : []),
   ];
 }

@@ -445,6 +445,23 @@ it.layer(NodeServices.layer)("discoverClaudeSkills", (it) => {
       ]);
 
       const programFiles = path.join(tempDir, "Program Files");
+      const programData = path.join(tempDir, "ProgramData");
+      yield* writeSkill(
+        path.join(programData, "ClaudeCode", ".claude", "skills"),
+        "legacy-only",
+        "# Legacy skills must not be discovered",
+      );
+      yield* fs.writeFileString(
+        path.join(programData, "ClaudeCode", "managed-settings.json"),
+        '{"skillOverrides":{"deploy":"off"}}',
+      );
+      for (const ProgramFiles of [undefined, "", programFiles]) {
+        const legacySkills = yield* discoverClaudeSkills({ homePath: configDir }, workspace, {
+          PROGRAMDATA: programData,
+          ...(ProgramFiles !== undefined ? { ProgramFiles } : {}),
+        });
+        assert.deepEqual(legacySkills, [{ ...skills[0], enabled: false }]);
+      }
       yield* writeSkill(
         path.join(programFiles, "ClaudeCode", ".claude", "skills"),
         "deploy",
@@ -460,6 +477,7 @@ it.layer(NodeServices.layer)("discoverClaudeSkills", (it) => {
       );
       const managedSkills = yield* discoverClaudeSkills({ homePath: configDir }, workspace, {
         ProgramFiles: programFiles,
+        PROGRAMDATA: programData,
       });
 
       assert.deepEqual(managedSkills, [
